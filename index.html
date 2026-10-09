@@ -101,7 +101,6 @@
     }
     .badge-admin-locked { font-size: 9px; background: #ef4444; color: white; padding: 1px 4px; border-radius: 3px; margin-left: 4px; }
 
-    /* MEDIA QUERIES FÜR SMARTPHONES */
     @media (max-width: 768px) {
       body { padding: 5px; }
       .event-bar, .user-bar { flex-direction: column; align-items: stretch; }
@@ -117,7 +116,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCtRnys6wOzVKqJaN1HH9eDww-EI-_CU-k",
@@ -134,6 +133,9 @@
 
     window.firebaseAuth = auth;
     window.firebaseDb = db;
+    window.firestoreDoc = doc;
+    window.firestoreSetDoc = setDoc;
+    window.firestoreOnSnapshot = onSnapshot;
 
     window.loginUser = async function(emailInput, passInput) {
       const email = emailInput || document.getElementById('loginEmail').value.trim();
@@ -165,7 +167,7 @@
         document.getElementById('userRoleDisplay').innerText = window.isAdmin ? "(Admin)" : "(Lehrkraft)";
         document.getElementById('btnAdminTemplate').style.display = window.isAdmin ? 'inline-flex' : 'none';
         
-        initApp();
+        initAppWithFirebase();
       } else {
         document.getElementById('loginOverlay').style.display = 'flex';
         document.getElementById('appContainer').style.display = 'none';
@@ -226,7 +228,7 @@
       </div>
     </div>
 
-    <!-- PROGRAMM TABELLE (OPTIMIERT FÜR MOBILE) -->
+    <!-- PROGRAMM TABELLE -->
     <div class="table-container">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap:wrap; gap:10px;">
         <h3 style="margin: 0; font-size:16px;" id="eventTitleDisplay">Beiträge der Veranstaltung</h3>
@@ -312,7 +314,7 @@
         <button class="ctrl-btn danger" style="margin-left: auto;" onclick="deleteSelected()">🗑️ Löschen</button>
       </div>
 
-      <!-- SCROLLBARER BÜHNEN-CONTAINER (ANDROID COMPATIBLE) -->
+      <!-- BÜHNEN CANVAS -->
       <div class="stage-wrapper">
         <div class="stage-canvas" id="stageCanvas" onclick="deselectAll(event)">
           <div class="stage-title-center">B Ü H N E</div>
@@ -332,7 +334,7 @@
 
   </div>
 
-  <!-- LOGIK SCRIPT -->
+  <!-- FIREBASE CLOUD SYNCHRONISIERUNG -->
   <script>
     const defaultEvents = [
       { id: 'evt_weihnachten', title: 'Weihnachtskonzert 2026', adminTemplate: [], entries: [
@@ -348,27 +350,28 @@
     let currentEditingEntryId = null; 
     let selectedElement = null;
 
-    function loadSavedEvents() {
-      const storedData = localStorage.getItem('konzert_manager_events');
-      if (storedData) {
-        try {
-          events = JSON.parse(storedData);
-        } catch(e) {
+    function initAppWithFirebase() {
+      const docRef = window.firestoreDoc(window.firebaseDb, "app_data", "events_store");
+
+      window.firestoreOnSnapshot(docRef, (snapshot) => {
+        if (snapshot.exists()) {
+          events = snapshot.data().events || defaultEvents;
+        } else {
           events = defaultEvents;
+          saveEventsToFirebase();
         }
-      } else {
-        events = defaultEvents;
+        renderEventSelect();
+        renderTable();
+      });
+    }
+
+    async function saveEventsToFirebase() {
+      try {
+        const docRef = window.firestoreDoc(window.firebaseDb, "app_data", "events_store");
+        await window.firestoreSetDoc(docRef, { events: events });
+      } catch (e) {
+        console.error("Fehler beim Speichern in Firebase:", e);
       }
-    }
-
-    function saveEventsToStorage() {
-      localStorage.setItem('konzert_manager_events', JSON.stringify(events));
-    }
-
-    function initApp() {
-      loadSavedEvents();
-      renderEventSelect();
-      renderTable();
     }
 
     function renderEventSelect() {
@@ -396,7 +399,7 @@
         const newEvt = { id: 'evt_' + Date.now(), title: title, adminTemplate: [], entries: [] };
         events.push(newEvt);
         currentEventId = newEvt.id;
-        saveEventsToStorage();
+        saveEventsToFirebase();
         renderEventSelect();
         renderTable();
       }
@@ -448,7 +451,7 @@
         stageObjects: []
       };
       evt.entries.push(newEntry);
-      saveEventsToStorage();
+      saveEventsToFirebase();
       renderTable();
     }
 
@@ -457,14 +460,14 @@
       const entry = evt.entries.find(e => e.id === id);
       if (entry) {
         entry[field] = value;
-        saveEventsToStorage();
+        saveEventsToFirebase();
       }
     }
 
     function deleteEntry(id) {
       const evt = getActiveEvent();
       evt.entries = evt.entries.filter(e => e.id !== id);
-      saveEventsToStorage();
+      saveEventsToFirebase();
       renderTable();
     }
 
@@ -551,7 +554,7 @@
         if (entry) entry.stageObjects = objectsData;
       }
 
-      saveEventsToStorage();
+      saveEventsToFirebase();
       document.getElementById('editorView').style.display = 'none';
       renderTable();
     }
