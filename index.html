@@ -49,17 +49,19 @@
     .btn-secondary { background: #64748b; color: white; }
     .btn-outline { background: white; border: 1px solid #cbd5e1; color: #334155; }
 
-    /* TABLE STYLES MIT DRAG & DROP SUPPORT */
+    /* TABLE STYLES MIT FREIEM DRAG & DROP + PFEILEN */
     .table-container { background: white; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; margin-bottom: 15px; }
     .table-scroll-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { width: 100%; min-width: 750px; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+    table { width: 100%; min-width: 800px; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; vertical-align: middle; }
     th { background: #f8fafc; color: #475569; }
 
     tr.draggable-row { cursor: grab; }
     tr.draggable-row:active { cursor: grabbing; background: #eff6ff; }
     tr.dragging { opacity: 0.4; background: #dbeafe; }
-    .drag-handle { cursor: grab; font-size: 16px; color: #94a3b8; user-select: none; }
+    .drag-handle { cursor: grab; font-size: 16px; color: #2563eb; user-select: none; font-weight: bold; margin-right: 4px; }
+    .btn-sort { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; font-weight: bold; color: #334155; }
+    .btn-sort:hover { background: #e2e8f0; }
 
     /* EDITOR STYLES */
     #editorView { display: none; background: white; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 10px; }
@@ -74,14 +76,14 @@
     .ctrl-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
     .ctrl-btn.danger { background: #ef4444; }
 
-    /* BÜHNEN-CONTAINER */
+    /* SCROLLBARER & SCHNITTSICHERER BÜHNEN-CONTAINER */
     .stage-wrapper { width: 100%; overflow-x: auto; overflow-y: hidden; border: 2px solid #0f172a; border-radius: 6px; background: #fff; }
     .stage-canvas { 
-      width: 100%; min-width: 900px; height: 550px; background-color: #ffffff; 
-      position: relative; overflow: hidden; touch-action: none;
+      width: 100%; min-width: 950px; height: 560px; background-color: #ffffff; 
+      position: relative; overflow: visible; touch-action: none; padding-right: 20px;
     }
     
-    /* INFOBOX MIT STUHL- & NOTENSTÄNDER-ZÄHLER */
+    /* INFOBOX OPTIMIERUNG */
     .stage-infobox { 
       position: absolute; top: 10px; right: 10px; border: 1.5px solid #0f172a; background: white; 
       width: 290px; font-size: 11px; z-index: 5; pointer-events: none; 
@@ -95,7 +97,7 @@
     .stage-label-bottom { position: absolute; bottom: 10px; left: 15px; font-weight: bold; font-size: 12px; color: #2563eb; pointer-events: none; }
     .stage-title-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 28px; font-weight: 900; color: #e2e8f0; pointer-events: none; }
 
-    /* STAGE ELEMENTE */
+    /* STAGE ELEMENTE UNBESCHNITTEN */
     .stage-element { 
       position: absolute; cursor: move; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: center; transform-origin: center center; z-index: 10;
     }
@@ -240,7 +242,7 @@
       </div>
     </div>
 
-    <!-- PROGRAMM TABELLE WITH DRAG & DROP -->
+    <!-- PROGRAMM TABELLE MIT PFEILEN UND FREIEM DRAG & DROP -->
     <div class="table-container">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap:wrap; gap:10px;">
         <h3 style="margin: 0; font-size:16px;" id="eventTitleDisplay">Beiträge der Veranstaltung</h3>
@@ -252,7 +254,7 @@
           <thead>
             <tr>
               <th style="width: 30px;"><input type="checkbox" id="selectAllCheck" onchange="toggleSelectAll(this)"></th>
-              <th style="width: 35px;"></th>
+              <th style="width: 80px;">Sortieren</th>
               <th style="width: 40px;">Nr.</th>
               <th>Lehrkraft</th>
               <th>Werk / Stück</th>
@@ -355,7 +357,7 @@
 
   </div>
 
-  <!-- FIREBASE & CORE LOGIC -->
+  <!-- FIREBASE & LOGIK -->
   <script>
     const defaultEvents = [
       { id: 'evt_weihnachten', title: 'Weihnachtskonzert 2026', adminTemplate: [], entries: [
@@ -430,7 +432,7 @@
       return events.find(e => e.id === currentEventId) || events[0];
     }
 
-    /* TABELLEN-RENDERING UND DRAG & DROP LEHRKRAFT/ADMIN */
+    /* RENDER-TABELLE MIT DRAG & DROP SOWIE PFEIL-SORTIERUNG */
     function renderTable() {
       const tbody = document.getElementById('programTableBody');
       tbody.innerHTML = '';
@@ -446,9 +448,15 @@
           tr.setAttribute('data-index', idx);
         }
 
+        const sortControls = window.isAdmin ? `
+          <span class="drag-handle" title="Ziehen zum freien Sortieren">☰</span>
+          <button class="btn-sort" onclick="moveEntry(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>▲</button>
+          <button class="btn-sort" onclick="moveEntry(${idx}, 1)" ${idx === evt.entries.length - 1 ? 'disabled' : ''}>▼</button>
+        ` : '-';
+
         tr.innerHTML = `
           <td><input type="checkbox" class="entry-check" data-id="${entry.id}"></td>
-          <td style="text-align:center;">${window.isAdmin ? '<span class="drag-handle" title="Ziehen zum Sortieren">☰</span>' : ''}</td>
+          <td>${sortControls}</td>
           <td><strong>${idx + 1}.</strong></td>
           <td><input type="text" value="${entry.teacher}" onchange="updateEntry(${entry.id}, 'teacher', this.value)" ${!canEdit ? 'disabled' : ''} style="width:100px;"></td>
           <td><input type="text" value="${entry.title}" onchange="updateEntry(${entry.id}, 'title', this.value)" ${!canEdit ? 'disabled' : ''} style="width:120px;"></td>
@@ -471,6 +479,18 @@
 
         tbody.appendChild(tr);
       });
+    }
+
+    function moveEntry(index, direction) {
+      const evt = getActiveEvent();
+      const targetIndex = index + direction;
+      if (targetIndex >= 0 && targetIndex < evt.entries.length) {
+        const temp = evt.entries[index];
+        evt.entries[index] = evt.entries[targetIndex];
+        evt.entries[targetIndex] = temp;
+        saveEventsToFirebase();
+        renderTable();
+      }
     }
 
     let dragSrcIndex = null;
@@ -631,7 +651,7 @@
       document.getElementById('editorView').style.display = 'none';
     }
 
-    /* ZÄHLUNG FÜR STÜHLE UND NOTENSTÄNDER */
+    /* BÜHNENELEMENT ZÄHLER */
     function updateElementCounters() {
       const stage = document.getElementById('stageCanvas');
       const elements = stage.querySelectorAll('.stage-element');
