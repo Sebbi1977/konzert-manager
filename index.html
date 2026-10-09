@@ -49,12 +49,17 @@
     .btn-secondary { background: #64748b; color: white; }
     .btn-outline { background: white; border: 1px solid #cbd5e1; color: #334155; }
 
-    /* TABLE STYLES MIT SCROLL-CONTAINER FÜR MOBILE */
+    /* TABLE STYLES MIT DRAG & DROP SUPPORT */
     .table-container { background: white; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; margin-bottom: 15px; }
     .table-scroll-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { width: 100%; min-width: 700px; border-collapse: collapse; margin-top: 10px; }
+    table { width: 100%; min-width: 750px; border-collapse: collapse; margin-top: 10px; }
     th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
     th { background: #f8fafc; color: #475569; }
+
+    tr.draggable-row { cursor: grab; }
+    tr.draggable-row:active { cursor: grabbing; background: #eff6ff; }
+    tr.dragging { opacity: 0.4; background: #dbeafe; }
+    .drag-handle { cursor: grab; font-size: 16px; color: #94a3b8; user-select: none; }
 
     /* EDITOR STYLES */
     #editorView { display: none; background: white; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 10px; }
@@ -69,25 +74,32 @@
     .ctrl-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
     .ctrl-btn.danger { background: #ef4444; }
 
-    /* SCROLLBARER BÜHNEN-CONTAINER (ANDROID COMPATIBLE) */
+    /* BÜHNEN-CONTAINER */
     .stage-wrapper { width: 100%; overflow-x: auto; overflow-y: hidden; border: 2px solid #0f172a; border-radius: 6px; background: #fff; }
     .stage-canvas { 
-      width: 900px; height: 550px; background-color: #ffffff; 
+      width: 100%; min-width: 900px; height: 550px; background-color: #ffffff; 
       position: relative; overflow: hidden; touch-action: none;
     }
-    .stage-infobox { position: absolute; top: 10px; right: 10px; border: 1.5px solid #0f172a; background: white; width: 280px; font-size: 11px; z-index: 10; }
+    
+    /* INFOBOX MIT STUHL- & NOTENSTÄNDER-ZÄHLER */
+    .stage-infobox { 
+      position: absolute; top: 10px; right: 10px; border: 1.5px solid #0f172a; background: white; 
+      width: 290px; font-size: 11px; z-index: 5; pointer-events: none; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .stage-infobox input { pointer-events: auto; }
     .stage-infobox table { width: 100%; min-width: 0; border-collapse: collapse; margin: 0; }
     .stage-infobox td { padding: 4px 6px; border-bottom: 1px solid #0f172a; }
-    .stage-infobox td:first-child { font-weight: bold; width: 90px; border-right: 1px solid #0f172a; background: #f8fafc; }
+    .stage-infobox td:first-child { font-weight: bold; width: 110px; border-right: 1px solid #0f172a; background: #f8fafc; }
 
-    .stage-label-bottom { position: absolute; bottom: 10px; left: 15px; font-weight: bold; font-size: 12px; color: #2563eb; }
+    .stage-label-bottom { position: absolute; bottom: 10px; left: 15px; font-weight: bold; font-size: 12px; color: #2563eb; pointer-events: none; }
     .stage-title-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 28px; font-weight: 900; color: #e2e8f0; pointer-events: none; }
 
-    /* STAGE ELEMENTE & SKALIERUNG */
+    /* STAGE ELEMENTE */
     .stage-element { 
-      position: absolute; cursor: move; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: center; transform-origin: center center;
+      position: absolute; cursor: move; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: center; transform-origin: center center; z-index: 10;
     }
-    .stage-element.selected { outline: 2px dashed #2563eb; outline-offset: 2px; }
+    .stage-element.selected { outline: 2px dashed #2563eb; outline-offset: 2px; z-index: 20; }
     
     .stage-element[data-admin-locked="true"] {
       border: 2px dashed #ef4444 !important;
@@ -228,7 +240,7 @@
       </div>
     </div>
 
-    <!-- PROGRAMM TABELLE -->
+    <!-- PROGRAMM TABELLE WITH DRAG & DROP -->
     <div class="table-container">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap:wrap; gap:10px;">
         <h3 style="margin: 0; font-size:16px;" id="eventTitleDisplay">Beiträge der Veranstaltung</h3>
@@ -240,6 +252,7 @@
           <thead>
             <tr>
               <th style="width: 30px;"><input type="checkbox" id="selectAllCheck" onchange="toggleSelectAll(this)"></th>
+              <th style="width: 35px;"></th>
               <th style="width: 40px;">Nr.</th>
               <th>Lehrkraft</th>
               <th>Werk / Stück</th>
@@ -324,6 +337,14 @@
               <tr><td>Lehrkraft:</td><td><input type="text" id="infoTeacher" style="border:none; width:100%; font-weight:bold;"></td></tr>
               <tr><td>Werk / Titel:</td><td><input type="text" id="infoTitle" style="border:none; width:100%;"></td></tr>
               <tr><td>Schüler / Ensemble:</td><td><input type="text" id="infoStudents" style="border:none; width:100%;"></td></tr>
+              <tr style="background: #eff6ff;">
+                <td>🪑 Stühle:</td>
+                <td><strong id="chairCountDisplay" style="color:#2563eb; font-size:12px;">0</strong></td>
+              </tr>
+              <tr style="background: #eff6ff;">
+                <td>🎼 Notenständer:</td>
+                <td><strong id="standCountDisplay" style="color:#2563eb; font-size:12px;">0</strong></td>
+              </tr>
             </table>
           </div>
 
@@ -334,7 +355,7 @@
 
   </div>
 
-  <!-- FIREBASE CLOUD SYNCHRONISIERUNG -->
+  <!-- FIREBASE & CORE LOGIC -->
   <script>
     const defaultEvents = [
       { id: 'evt_weihnachten', title: 'Weihnachtskonzert 2026', adminTemplate: [], entries: [
@@ -409,6 +430,7 @@
       return events.find(e => e.id === currentEventId) || events[0];
     }
 
+    /* TABELLEN-RENDERING UND DRAG & DROP LEHRKRAFT/ADMIN */
     function renderTable() {
       const tbody = document.getElementById('programTableBody');
       tbody.innerHTML = '';
@@ -418,8 +440,15 @@
         const tr = document.createElement('tr');
         const canEdit = window.isAdmin || !entry.isCreatedByAdmin;
 
+        if (window.isAdmin) {
+          tr.className = 'draggable-row';
+          tr.draggable = true;
+          tr.setAttribute('data-index', idx);
+        }
+
         tr.innerHTML = `
           <td><input type="checkbox" class="entry-check" data-id="${entry.id}"></td>
+          <td style="text-align:center;">${window.isAdmin ? '<span class="drag-handle" title="Ziehen zum Sortieren">☰</span>' : ''}</td>
           <td><strong>${idx + 1}.</strong></td>
           <td><input type="text" value="${entry.teacher}" onchange="updateEntry(${entry.id}, 'teacher', this.value)" ${!canEdit ? 'disabled' : ''} style="width:100px;"></td>
           <td><input type="text" value="${entry.title}" onchange="updateEntry(${entry.id}, 'title', this.value)" ${!canEdit ? 'disabled' : ''} style="width:120px;"></td>
@@ -435,7 +464,43 @@
             ${canEdit ? `<button class="btn btn-danger" onclick="deleteEntry(${entry.id})" style="padding:4px 8px;">✕</button>` : `<span style="font-size:10px; color:#ef4444;">Gesperrt</span>`}
           </td>
         `;
+
+        if (window.isAdmin) {
+          addDragAndDropHandlers(tr);
+        }
+
         tbody.appendChild(tr);
+      });
+    }
+
+    let dragSrcIndex = null;
+
+    function addDragAndDropHandlers(row) {
+      row.addEventListener('dragstart', (e) => {
+        dragSrcIndex = parseInt(row.getAttribute('data-index'));
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      row.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      });
+
+      row.addEventListener('dragend', () => {
+        row.classList.remove('dragging');
+      });
+
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const targetIndex = parseInt(row.getAttribute('data-index'));
+        if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+          const evt = getActiveEvent();
+          const movedItem = evt.entries.splice(dragSrcIndex, 1)[0];
+          evt.entries.splice(targetIndex, 0, movedItem);
+          saveEventsToFirebase();
+          renderTable();
+        }
       });
     }
 
@@ -487,6 +552,7 @@
       }
 
       document.getElementById('editorView').style.display = 'block';
+      updateElementCounters();
     }
 
     function openEditor(entryId) {
@@ -513,6 +579,7 @@
       }
 
       document.getElementById('editorView').style.display = 'block';
+      updateElementCounters();
     }
 
     function setEditorReadOnly(readOnly) {
@@ -534,6 +601,7 @@
           objectsData.push({
             svgHtml: svgEl ? svgEl.outerHTML : '',
             label: el.getAttribute('data-label'),
+            typeKey: el.getAttribute('data-typekey') || '',
             isResizable: el.getAttribute('data-resizable') === 'true',
             rot: el.getAttribute('data-rotation') || '0',
             sx: el.getAttribute('data-scalex') || '1',
@@ -563,6 +631,30 @@
       document.getElementById('editorView').style.display = 'none';
     }
 
+    /* ZÄHLUNG FÜR STÜHLE UND NOTENSTÄNDER */
+    function updateElementCounters() {
+      const stage = document.getElementById('stageCanvas');
+      const elements = stage.querySelectorAll('.stage-element');
+      
+      let chairCount = 0;
+      let standCount = 0;
+
+      elements.forEach(el => {
+        const typeKey = el.getAttribute('data-typekey') || '';
+        const label = (el.getAttribute('data-label') || '').toLowerCase();
+
+        if (typeKey === 'chair' || label.includes('stuhl') || label.includes('klavierbank')) {
+          chairCount++;
+        }
+        if (typeKey === 'stand-high' || typeKey === 'stand-low' || label.includes('ständer') || label.includes('notenständer')) {
+          standCount++;
+        }
+      });
+
+      document.getElementById('chairCountDisplay').innerText = chairCount;
+      document.getElementById('standCountDisplay').innerText = standCount;
+    }
+
     function addResizableElement(type, label) {
       let svg = '';
       if (type === 'curtain') svg = `<svg class="element-svg" width="140" height="20" viewBox="0 0 140 20"><rect x="0" y="2" width="140" height="16" fill="#dc2626" stroke="#7f1d1d" stroke-width="1.5" rx="2"/><circle cx="10" cy="10" r="2.5" fill="#fef08a"/><circle cx="30" cy="10" r="2.5" fill="#fef08a"/><circle cx="50" cy="10" r="2.5" fill="#fef08a"/><circle cx="70" cy="10" r="2.5" fill="#fef08a"/><circle cx="90" cy="10" r="2.5" fill="#fef08a"/><circle cx="110" cy="10" r="2.5" fill="#fef08a"/><circle cx="130" cy="10" r="2.5" fill="#fef08a"/></svg>`;
@@ -582,7 +674,7 @@
       if (type === 'column') svg = `<svg class="element-svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="2"/><circle cx="15" cy="15" r="8" fill="#e2e8f0" stroke="#0f172a" stroke-width="1"/></svg>`;
       if (type === 'stairs') svg = `<svg class="element-svg" width="100" height="40" viewBox="0 0 100 40"><rect x="1" y="1" width="98" height="38" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/><line x1="25" y1="1" x2="25" y2="39" stroke="#0f172a" stroke-width="1.5"/><line x1="50" y1="1" x2="50" y2="39" stroke="#0f172a" stroke-width="1.5"/><line x1="75" y1="1" x2="75" y2="39" stroke="#0f172a" stroke-width="1.5"/></svg>`;
 
-      createElementOnStage(svg, label, true);
+      createElementOnStage(svg, label, true, type);
     }
 
     function addFixedElement(type, label) {
@@ -685,10 +777,10 @@
       if (type === 'mic-vocal') svg = `<svg class="element-svg" width="20" height="35"><circle cx="10" cy="8" r="5" fill="#ef4444" stroke="#000" stroke-width="1.5"/><line x1="10" y1="13" x2="10" y2="32" stroke="#000" stroke-width="2"/><line x1="4" y1="32" x2="16" y2="32" stroke="#000" stroke-width="2"/></svg>`;
       if (type === 'mic-instr') svg = `<svg class="element-svg" width="20" height="35"><circle cx="10" cy="8" r="5" fill="#3b82f6" stroke="#000" stroke-width="1.5"/><line x1="10" y1="13" x2="10" y2="32" stroke="#000" stroke-width="2"/><line x1="4" y1="32" x2="16" y2="32" stroke="#000" stroke-width="2"/></svg>`;
 
-      createElementOnStage(svg, label, false);
+      createElementOnStage(svg, label, false, type);
     }
 
-    function createElementOnStage(svgHtml, labelText, isResizable) {
+    function createElementOnStage(svgHtml, labelText, isResizable, typeKey) {
       const stage = document.getElementById('stageCanvas');
       const el = document.createElement('div');
       el.className = 'stage-element';
@@ -696,6 +788,7 @@
       el.style.top = '100px';
       el.setAttribute('data-resizable', isResizable ? 'true' : 'false');
       el.setAttribute('data-label', labelText);
+      el.setAttribute('data-typekey', typeKey || '');
       el.setAttribute('data-rotation', '0');
       el.setAttribute('data-scalex', '1');
       el.setAttribute('data-scaley', '1');
@@ -711,6 +804,7 @@
       makeDraggable(el);
       stage.appendChild(el);
       selectElement(el, { stopPropagation: () => {} });
+      updateElementCounters();
     }
 
     function restoreStageElement(data, isAdminLocked) {
@@ -721,6 +815,7 @@
       el.style.top = data.top || '100px';
       el.setAttribute('data-resizable', data.isResizable ? 'true' : 'false');
       el.setAttribute('data-label', data.label || 'Element');
+      el.setAttribute('data-typekey', data.typeKey || '');
       el.setAttribute('data-rotation', data.rot || '0');
       el.setAttribute('data-scalex', data.sx || '1');
       el.setAttribute('data-scaley', data.sy || '1');
@@ -829,6 +924,7 @@
       if (selectedElement) {
         selectedElement.remove();
         selectedElement = null;
+        updateElementCounters();
       }
     }
 
@@ -842,6 +938,7 @@
         }
       });
       selectedElement = null;
+      updateElementCounters();
     }
 
     function makeDraggable(element) {
