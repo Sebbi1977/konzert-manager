@@ -7,102 +7,110 @@
   
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { margin: 0; padding: 15px; background: #e2e8f0; color: #1e293b; }
+    body { margin: 0; padding: 10px; background: #e2e8f0; color: #1e293b; }
     
     /* LOGIN SCREEN */
     .login-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 2000;
+      background: #0f172a; display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 15px;
     }
     .login-card {
-      background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 420px;
+      background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 420px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center;
     }
-    .login-card h2 { margin-top: 0; color: #0f172a; }
+    .login-card h2 { margin-top: 0; color: #0f172a; font-size: 20px; }
     .login-field { margin-bottom: 15px; text-align: left; }
     .login-field label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #64748b; }
     .login-field input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
     .login-btn { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
     .login-error { color: #ef4444; font-size: 12px; margin-top: 10px; display: none; }
 
-    .test-credentials-bar { display: flex; gap: 8px; margin-bottom: 20px; background: #f1f5f9; padding: 10px; border-radius: 8px; justify-content: center; }
-    .test-btn { background: #3b82f6; border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; color: white; }
+    .test-credentials-bar { display: flex; gap: 8px; margin-bottom: 15px; background: #f1f5f9; padding: 10px; border-radius: 8px; justify-content: center; flex-wrap: wrap; }
+    .test-btn { background: #3b82f6; border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; color: white; flex: 1; min-width: 120px; }
     .test-btn.admin { background: #f59e0b; }
-    .test-btn:hover { opacity: 0.9; }
 
     /* HAUPT-APP UI */
     .app-container { max-width: 1400px; margin: 0 auto; display: none; }
-    .user-bar { background: #0f172a; color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-    .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .user-bar { background: #0f172a; color: white; padding: 10px 15px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 13px; }
+    .btn-logout { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
     /* EVENT SELECTOR BAR */
     .event-bar {
-      background: white; padding: 15px 20px; border-radius: 10px; border: 1px solid #cbd5e1;
-      margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+      background: white; padding: 12px 15px; border-radius: 10px; border: 1px solid #cbd5e1;
+      margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
     }
-    .event-select-group { display: flex; align-items: center; gap: 10px; }
-    .event-select-group select { padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: bold; font-size: 14px; }
+    .event-select-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; max-width: 400px; }
+    .event-select-group select { padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: bold; font-size: 13px; flex: 1; }
     
-    .btn { padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; }
+    .btn { padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
     .btn-primary { background: #2563eb; color: white; }
     .btn-success { background: #10b981; color: white; }
     .btn-danger { background: #ef4444; color: white; }
     .btn-secondary { background: #64748b; color: white; }
     .btn-outline { background: white; border: 1px solid #cbd5e1; color: #334155; }
 
-    /* TABLE STYLES */
-    .table-container { background: white; padding: 20px; border-radius: 10px; border: 1px solid #cbd5e1; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+    /* TABLE STYLES MIT SCROLL-CONTAINER FÜR MOBILE */
+    .table-container { background: white; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; margin-bottom: 15px; }
+    .table-scroll-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; min-width: 700px; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
     th { background: #f8fafc; color: #475569; }
 
     /* EDITOR STYLES */
-    #editorView { display: none; background: white; padding: 20px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 10px; }
+    #editorView { display: none; background: white; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 10px; }
     
     .toolbar-category { font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 4px; width: 100%; margin-top: 6px; }
-    .toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
-    .tool-btn { background: white; border: 1px solid #94a3b8; color: #0f172a; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; display: flex; align-items: center; gap: 5px; }
-    .tool-btn:hover { background: #e2e8f0; }
+    .toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; }
+    .tool-btn { background: white; border: 1px solid #94a3b8; color: #0f172a; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; display: flex; align-items: center; gap: 4px; }
 
     /* CONTROLS BAR */
-    .controls-bar { display: flex; gap: 10px; align-items: center; background: #eff6ff; border: 1px solid #bfdbfe; padding: 10px 15px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; }
-    .ctrl-btn { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    .controls-bar { display: flex; gap: 8px; align-items: center; background: #eff6ff; border: 1px solid #bfdbfe; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 11px; flex-wrap: wrap; }
+    .ctrl-btn { background: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
     .ctrl-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
     .ctrl-btn.danger { background: #ef4444; }
 
-    /* BÜHNE CANVAS */
+    /* SCROLLBARER BÜHNEN-CONTAINER (ANDROID COMPATIBLE) */
+    .stage-wrapper { width: 100%; overflow-x: auto; overflow-y: hidden; border: 2px solid #0f172a; border-radius: 6px; background: #fff; }
     .stage-canvas { 
-      width: 100%; height: 600px; background-color: #ffffff; border: 2px solid #0f172a; 
-      position: relative; overflow: hidden; touch-action: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      width: 900px; height: 550px; background-color: #ffffff; 
+      position: relative; overflow: hidden; touch-action: none;
     }
-    .stage-infobox { position: absolute; top: 15px; right: 15px; border: 2px solid #0f172a; background: white; width: 320px; font-size: 12px; z-index: 10; }
-    .stage-infobox table { width: 100%; border-collapse: collapse; }
-    .stage-infobox td { padding: 5px 8px; border-bottom: 1px solid #0f172a; }
-    .stage-infobox td:first-child { font-weight: bold; width: 110px; border-right: 1px solid #0f172a; background: #f8fafc; }
+    .stage-infobox { position: absolute; top: 10px; right: 10px; border: 1.5px solid #0f172a; background: white; width: 280px; font-size: 11px; z-index: 10; }
+    .stage-infobox table { width: 100%; min-width: 0; border-collapse: collapse; margin: 0; }
+    .stage-infobox td { padding: 4px 6px; border-bottom: 1px solid #0f172a; }
+    .stage-infobox td:first-child { font-weight: bold; width: 90px; border-right: 1px solid #0f172a; background: #f8fafc; }
 
-    .stage-label-bottom { position: absolute; bottom: 15px; left: 20px; font-weight: bold; font-size: 13px; color: #2563eb; }
-    .stage-title-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; font-weight: 900; color: #e2e8f0; pointer-events: none; }
+    .stage-label-bottom { position: absolute; bottom: 10px; left: 15px; font-weight: bold; font-size: 12px; color: #2563eb; }
+    .stage-title-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 28px; font-weight: 900; color: #e2e8f0; pointer-events: none; }
 
-    /* STAGE ELEMENTE */
+    /* STAGE ELEMENTE & SKALIERUNG */
     .stage-element { 
       position: absolute; cursor: move; user-select: none; display: flex; flex-direction: column; align-items: center; justify-content: center; transform-origin: center center;
     }
-    .stage-element.selected { outline: 2px dashed #2563eb; outline-offset: 3px; }
+    .stage-element.selected { outline: 2px dashed #2563eb; outline-offset: 2px; }
     
-    /* VISUELLE HINWEISE FÜR ADMIN ELEMENTE */
     .stage-element[data-admin-locked="true"] {
       border: 2px dashed #ef4444 !important;
-      padding: 2px;
-      border-radius: 4px;
-      background: transparent !important;
+      padding: 2px; border-radius: 4px; background: transparent !important;
     }
     
     .element-label { 
       font-size: 10px; font-weight: bold; color: #0f172a; margin-top: 2px; 
-      white-space: nowrap; text-align: center; background: rgba(255,255,255,0.9); 
+      white-space: nowrap; text-align: center; background: rgba(255,255,255,0.95); 
       padding: 1px 4px; border-radius: 2px; border: 1px solid #cbd5e1;
     }
     .badge-admin-locked { font-size: 9px; background: #ef4444; color: white; padding: 1px 4px; border-radius: 3px; margin-left: 4px; }
+
+    /* MEDIA QUERIES FÜR SMARTPHONES */
+    @media (max-width: 768px) {
+      body { padding: 5px; }
+      .event-bar, .user-bar { flex-direction: column; align-items: stretch; }
+      .event-select-group { max-width: 100%; }
+      .btn { width: 100%; }
+      #editorHeader { flex-direction: column; gap: 8px; align-items: stretch !important; }
+      #editorHeader div { width: 100%; display: flex; gap: 5px; }
+      #editorHeader button { flex: 1; }
+    }
   </style>
 
   <!-- FIREBASE SDKs -->
@@ -154,8 +162,8 @@
         window.isAdmin = user.email.includes('admin');
 
         document.getElementById('userEmailDisplay').innerText = user.email;
-        document.getElementById('userRoleDisplay').innerText = window.isAdmin ? "(Administrator)" : "(Lehrkraft)";
-        document.getElementById('btnAdminTemplate').style.display = window.isAdmin ? 'inline-block' : 'none';
+        document.getElementById('userRoleDisplay').innerText = window.isAdmin ? "(Admin)" : "(Lehrkraft)";
+        document.getElementById('btnAdminTemplate').style.display = window.isAdmin ? 'inline-flex' : 'none';
         
         initApp();
       } else {
@@ -171,7 +179,7 @@
   <div class="login-overlay" id="loginOverlay">
     <div class="login-card">
       <h2>🎼 Konzert-Manager Login</h2>
-      <p style="color: #64748b; font-size: 13px; margin-bottom: 10px;">Schnellzugriff für Testzwecke:</p>
+      <p style="color: #64748b; font-size: 12px; margin-bottom: 10px;">Schnellzugriff für Testzwecke:</p>
 
       <div class="test-credentials-bar">
         <button class="test-btn" onclick="loginUser('lehrer@musikschule.de', 'Lehrer--')">👤 Test: Lehrkraft</button>
@@ -205,120 +213,120 @@
     <!-- VERANSTALTUNGS-BAR -->
     <div class="event-bar">
       <div class="event-select-group">
-        <label style="font-weight: bold; font-size: 14px;">📅 Veranstaltung:</label>
+        <label style="font-weight: bold; font-size: 13px;">📅 Veranstaltung:</label>
         <select id="eventSelect" onchange="switchEvent()">
           <!-- Dynamische Optionen -->
         </select>
       </div>
 
-      <div>
-        <button class="btn btn-outline" id="btnAdminTemplate" onclick="openAdminTemplate()" style="display:none; margin-right: 5px;">⚙️ Admin-Bühnenvorlage</button>
+      <div style="display:flex; gap:5px; flex-wrap:wrap; width:100%; margin-top:5px;">
+        <button class="btn btn-outline" id="btnAdminTemplate" onclick="openAdminTemplate()" style="display:none;">⚙️ Admin-Bühnenvorlage</button>
         <button class="btn btn-primary" onclick="createEvent()">+ Neue Veranstaltung</button>
         <button class="btn btn-success" onclick="exportToExcel()">📊 Excel Export</button>
       </div>
     </div>
 
-    <!-- PROGRAMM TABELLE -->
+    <!-- PROGRAMM TABELLE (OPTIMIERT FÜR MOBILE) -->
     <div class="table-container">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h3 style="margin: 0;" id="eventTitleDisplay">Beiträge der Veranstaltung</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap:wrap; gap:10px;">
+        <h3 style="margin: 0; font-size:16px;" id="eventTitleDisplay">Beiträge der Veranstaltung</h3>
         <button class="btn btn-primary" onclick="addNewEntry()">+ Neuer Beitrag</button>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 30px;"><input type="checkbox" id="selectAllCheck" onchange="toggleSelectAll(this)"></th>
-            <th style="width: 40px;">Nr.</th>
-            <th>Lehrkraft</th>
-            <th>Werk / Stück</th>
-            <th>Komponist</th>
-            <th>Schüler / Ensemble</th>
-            <th style="width: 180px;">Bühnenplan</th>
-            <th style="width: 80px;">Aktion</th>
-          </tr>
-        </thead>
-        <tbody id="programTableBody">
-          <!-- Dynamische Beiträge -->
-        </tbody>
-      </table>
+      <div class="table-scroll-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 30px;"><input type="checkbox" id="selectAllCheck" onchange="toggleSelectAll(this)"></th>
+              <th style="width: 40px;">Nr.</th>
+              <th>Lehrkraft</th>
+              <th>Werk / Stück</th>
+              <th>Komponist</th>
+              <th>Schüler / Ensemble</th>
+              <th style="width: 160px;">Bühnenplan</th>
+              <th style="width: 60px;">Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="programTableBody">
+            <!-- Dynamische Beiträge -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- BÜHNENPLAN EDITOR -->
     <div id="editorView">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h2 style="margin: 0;" id="editorHeaderTitle">🎭 Bühnenplan-Editor HD</h2>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-success" id="btnSaveEditor" onclick="saveAndCloseEditor()">💾 Bühnenplan speichern</button>
-          <button class="btn btn-secondary" onclick="closeEditor()">Abbrechen / Schließen</button>
+      <div id="editorHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h2 style="margin: 0; font-size:18px;" id="editorHeaderTitle">🎭 Bühnenplan-Editor HD</h2>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-success" id="btnSaveEditor" onclick="saveAndCloseEditor()">💾 Speichern</button>
+          <button class="btn btn-secondary" onclick="closeEditor()">Schließen</button>
         </div>
       </div>
 
-      <!-- KATEGORISIERTE TOOLBAR -->
+      <!-- TOOLBAR -->
       <div class="toolbar" id="editorToolbar">
-        <div class="toolbar-category">Architektur & Bauten (Größe verstellbar X/Y)</div>
-        <button class="tool-btn" onclick="addResizableElement('curtain', 'Vorhang')">🎪 Vorhang</button>
-        <button class="tool-btn" onclick="addResizableElement('podium', 'Podest')">🔲 Podest</button>
-        <button class="tool-btn" onclick="addResizableElement('wall', 'Wand')">🧱 Wand (Schraffur)</button>
-        <button class="tool-btn" onclick="addResizableElement('column', 'Säule')">🏛️ Säule</button>
-        <button class="tool-btn" onclick="addResizableElement('stairs', 'Treppe')">🪜 Treppe</button>
+        <div class="toolbar-category">Architektur & Bauten (Größe X/Y)</div>
+        <button class="tool-btn" onclick="addResizableElement('curtain', 'Vorhang')">Vorhang</button>
+        <button class="tool-btn" onclick="addResizableElement('podium', 'Podest')">Podest</button>
+        <button class="tool-btn" onclick="addResizableElement('wall', 'Wand')">Wand</button>
+        <button class="tool-btn" onclick="addResizableElement('column', 'Säule')">Säule</button>
+        <button class="tool-btn" onclick="addResizableElement('stairs', 'Treppe')">Treppe</button>
 
-        <div class="toolbar-category">Tasten & Schlaginstrumente</div>
-        <button class="tool-btn" onclick="addFixedElement('piano', 'Flügel')">🎹 Flügel</button>
-        <button class="tool-btn" onclick="addFixedElement('epiano', 'E-Piano')">🎹 E-Piano</button>
-        <button class="tool-btn" onclick="addFixedElement('piano-bench', 'Klavierbank')">🪑 Klavierbank</button>
-        <button class="tool-btn" onclick="addFixedElement('drums', 'Schlagzeug')">🥁 Schlagzeug</button>
+        <div class="toolbar-category">Tasten & Schlagwerk</div>
+        <button class="tool-btn" onclick="addFixedElement('piano', 'Flügel')">Flügel</button>
+        <button class="tool-btn" onclick="addFixedElement('epiano', 'E-Piano')">E-Piano</button>
+        <button class="tool-btn" onclick="addFixedElement('piano-bench', 'Klavierbank')">Klavierbank</button>
+        <button class="tool-btn" onclick="addFixedElement('drums', 'Schlagzeug')">Schlagzeug</button>
 
         <div class="toolbar-category">Gitarren & Saiten</div>
-        <button class="tool-btn" onclick="addFixedElement('guitar-ac', 'Akustikgitarre')">🎸 Akustikgitarre</button>
-        <button class="tool-btn" onclick="addFixedElement('guitar-el', 'E-Gitarre')">🎸 E-Gitarre</button>
-        <button class="tool-btn" onclick="addFixedElement('guitar-bass', 'Bassgitarre')">🎸 Bassgitarre</button>
-        <button class="tool-btn" onclick="addFixedElement('footrest', 'Fußbank')">🦶 Fußbank</button>
+        <button class="tool-btn" onclick="addFixedElement('guitar-ac', 'Akustikgitarre')">Akustikgitarre</button>
+        <button class="tool-btn" onclick="addFixedElement('guitar-el', 'E-Gitarre')">E-Gitarre</button>
+        <button class="tool-btn" onclick="addFixedElement('guitar-bass', 'Bassgitarre')">Bassgitarre</button>
+        <button class="tool-btn" onclick="addFixedElement('footrest', 'Fußbank')">Fußbank</button>
 
         <div class="toolbar-category">Beschallung & PA Technik</div>
-        <button class="tool-btn" onclick="addFixedElement('pa-left', 'PA Links')">🔊 PA Links</button>
-        <button class="tool-btn" onclick="addFixedElement('pa-right', 'PA Rechts')">🔊 PA Rechts</button>
-        <button class="tool-btn" onclick="addFixedElement('pa-box', 'PA Box')">📻 PA Box</button>
-        <button class="tool-btn" onclick="addFixedElement('monitor', 'Monitorbox')">📐 Monitorbox</button>
+        <button class="tool-btn" onclick="addFixedElement('pa-left', 'PA Links')">PA Links</button>
+        <button class="tool-btn" onclick="addFixedElement('pa-right', 'PA Rechts')">PA Rechts</button>
+        <button class="tool-btn" onclick="addFixedElement('pa-box', 'PA Box')">PA Box</button>
+        <button class="tool-btn" onclick="addFixedElement('monitor', 'Monitorbox')">Monitorbox</button>
 
         <div class="toolbar-category">Mikrofone & Zubehör</div>
-        <button class="tool-btn" onclick="addFixedElement('mic-vocal', 'Gesangsmikro')">🎤 Gesangsmikro</button>
-        <button class="tool-btn" onclick="addFixedElement('mic-instr', 'Instr.-Mikro')">🎙️ Instr.-Mikro</button>
-        <button class="tool-btn" onclick="addFixedElement('stand-high', 'Notenständer (hoch)')">🎼 Ständer (hoch)</button>
-        <button class="tool-btn" onclick="addFixedElement('stand-low', 'Notenständer (niedrig)')">🎼 Ständer (niedrig)</button>
-        <button class="tool-btn" onclick="addFixedElement('chair', 'Stuhl')">🪑 Stuhl</button>
+        <button class="tool-btn" onclick="addFixedElement('mic-vocal', 'Gesangsmikro')">Gesangsmikro</button>
+        <button class="tool-btn" onclick="addFixedElement('mic-instr', 'Instr.-Mikro')">Instr.-Mikro</button>
+        <button class="tool-btn" onclick="addFixedElement('stand-high', 'Notenständer (hoch)')">Ständer (hoch)</button>
+        <button class="tool-btn" onclick="addFixedElement('stand-low', 'Notenständer (niedrig)')">Ständer (niedrig)</button>
+        <button class="tool-btn" onclick="addFixedElement('chair', 'Stuhl')">Stuhl</button>
 
         <button class="tool-btn" style="background: #ef4444; color: white; margin-left: auto;" onclick="clearStage()">Bühne leeren</button>
       </div>
 
       <!-- CONTROLS BAR -->
       <div class="controls-bar" id="editorControlsBar">
-        <span>Element anpassen:</span>
+        <span>Anpassen:</span>
         <button class="ctrl-btn" onclick="rotateSelected(45)">🔄 Drehen (+45°)</button>
-        
-        <span style="border-left: 1px solid #93c5fd; height: 20px; margin: 0 5px;"></span>
-        <span style="font-size: 11px; color: #1e3a8a;">Skalierung (Nur Vorhang, Podest, Säule, Wand, Treppe):</span>
-        <button class="ctrl-btn" id="btnScaleXPlus" onclick="scaleSelected(1.2, 1.0)">↔️ Breite X +</button>
-        <button class="ctrl-btn" id="btnScaleXMinus" onclick="scaleSelected(0.8, 1.0)">↔️ Breite X -</button>
-        <button class="ctrl-btn" id="btnScaleYPlus" onclick="scaleSelected(1.0, 1.2)">↕️ Tiefe Y +</button>
-        <button class="ctrl-btn" id="btnScaleYMinus" onclick="scaleSelected(1.0, 0.8)">↕️ Tiefe Y -</button>
-
+        <button class="ctrl-btn" id="btnScaleXPlus" onclick="scaleSelected(1.2, 1.0)">↔️ Breite +</button>
+        <button class="ctrl-btn" id="btnScaleXMinus" onclick="scaleSelected(0.8, 1.0)">↔️ Breite -</button>
+        <button class="ctrl-btn" id="btnScaleYPlus" onclick="scaleSelected(1.0, 1.2)">↕️ Tiefe +</button>
+        <button class="ctrl-btn" id="btnScaleYMinus" onclick="scaleSelected(1.0, 0.8)">↕️ Tiefe -</button>
         <button class="ctrl-btn danger" style="margin-left: auto;" onclick="deleteSelected()">🗑️ Löschen</button>
       </div>
 
-      <!-- BÜHNE CANVAS -->
-      <div class="stage-canvas" id="stageCanvas" onclick="deselectAll(event)">
-        <div class="stage-title-center">B Ü H N E</div>
-        
-        <div class="stage-infobox">
-          <table>
-            <tr><td>Lehrkraft:</td><td><input type="text" id="infoTeacher" style="border:none; width:100%; font-weight:bold;"></td></tr>
-            <tr><td>Werk / Titel:</td><td><input type="text" id="infoTitle" style="border:none; width:100%;"></td></tr>
-            <tr><td>Schüler / Ensemble:</td><td><input type="text" id="infoStudents" style="border:none; width:100%;"></td></tr>
-          </table>
-        </div>
+      <!-- SCROLLBARER BÜHNEN-CONTAINER (ANDROID COMPATIBLE) -->
+      <div class="stage-wrapper">
+        <div class="stage-canvas" id="stageCanvas" onclick="deselectAll(event)">
+          <div class="stage-title-center">B Ü H N E</div>
+          
+          <div class="stage-infobox">
+            <table>
+              <tr><td>Lehrkraft:</td><td><input type="text" id="infoTeacher" style="border:none; width:100%; font-weight:bold;"></td></tr>
+              <tr><td>Werk / Titel:</td><td><input type="text" id="infoTitle" style="border:none; width:100%;"></td></tr>
+              <tr><td>Schüler / Ensemble:</td><td><input type="text" id="infoStudents" style="border:none; width:100%;"></td></tr>
+            </table>
+          </div>
 
-        <div class="stage-label-bottom">▼ PUBLIKUM / SAAL ▼</div>
+          <div class="stage-label-bottom">▼ PUBLIKUM / SAAL ▼</div>
+        </div>
       </div>
     </div>
 
@@ -410,18 +418,18 @@
         tr.innerHTML = `
           <td><input type="checkbox" class="entry-check" data-id="${entry.id}"></td>
           <td><strong>${idx + 1}.</strong></td>
-          <td><input type="text" value="${entry.teacher}" onchange="updateEntry(${entry.id}, 'teacher', this.value)" ${!canEdit ? 'disabled' : ''}></td>
-          <td><input type="text" value="${entry.title}" onchange="updateEntry(${entry.id}, 'title', this.value)" ${!canEdit ? 'disabled' : ''}></td>
-          <td><input type="text" value="${entry.composer}" onchange="updateEntry(${entry.id}, 'composer', this.value)" ${!canEdit ? 'disabled' : ''}></td>
-          <td><input type="text" value="${entry.students}" onchange="updateEntry(${entry.id}, 'students', this.value)" ${!canEdit ? 'disabled' : ''}></td>
+          <td><input type="text" value="${entry.teacher}" onchange="updateEntry(${entry.id}, 'teacher', this.value)" ${!canEdit ? 'disabled' : ''} style="width:100px;"></td>
+          <td><input type="text" value="${entry.title}" onchange="updateEntry(${entry.id}, 'title', this.value)" ${!canEdit ? 'disabled' : ''} style="width:120px;"></td>
+          <td><input type="text" value="${entry.composer}" onchange="updateEntry(${entry.id}, 'composer', this.value)" ${!canEdit ? 'disabled' : ''} style="width:100px;"></td>
+          <td><input type="text" value="${entry.students}" onchange="updateEntry(${entry.id}, 'students', this.value)" ${!canEdit ? 'disabled' : ''} style="width:120px;"></td>
           <td>
-            <button class="btn btn-primary" onclick="openEditor(${entry.id})">
-              ${entry.stageObjects && entry.stageObjects.length > 0 ? '✓ Plan anzeigen / bearbeiten' : '➕ Plan erstellen'}
+            <button class="btn btn-primary" onclick="openEditor(${entry.id})" style="font-size:11px; padding:4px 8px;">
+              ${entry.stageObjects && entry.stageObjects.length > 0 ? '✓ Plan anzeigen' : '➕ Plan erstellen'}
             </button>
             ${entry.isCreatedByAdmin ? '<span class="badge-admin-locked">Admin</span>' : ''}
           </td>
           <td>
-            ${canEdit ? `<button class="btn btn-danger" onclick="deleteEntry(${entry.id})">✕</button>` : `<span style="font-size:10px; color:#ef4444;">Gesperrt</span>`}
+            ${canEdit ? `<button class="btn btn-danger" onclick="deleteEntry(${entry.id})" style="padding:4px 8px;">✕</button>` : `<span style="font-size:10px; color:#ef4444;">Gesperrt</span>`}
           </td>
         `;
         tbody.appendChild(tr);
@@ -487,7 +495,7 @@
       const isReadOnly = !window.isAdmin && entry.isCreatedByAdmin;
       setEditorReadOnly(isReadOnly);
 
-      document.getElementById('editorHeaderTitle').innerText = (isReadOnly ? "👁️ Bühnenplan Ansicht (Schreibgeschützt): " : "🎭 Bühnenplan: ") + entry.title;
+      document.getElementById('editorHeaderTitle').innerText = (isReadOnly ? "👁️ Plan (Geschützt): " : "🎭 Plan: ") + entry.title;
       document.getElementById('infoTeacher').value = entry.teacher;
       document.getElementById('infoTitle').value = entry.title + " (" + entry.composer + ")";
       document.getElementById('infoStudents').value = entry.students;
@@ -681,8 +689,8 @@
       const stage = document.getElementById('stageCanvas');
       const el = document.createElement('div');
       el.className = 'stage-element';
-      el.style.left = '120px';
-      el.style.top = '120px';
+      el.style.left = '100px';
+      el.style.top = '100px';
       el.setAttribute('data-resizable', isResizable ? 'true' : 'false');
       el.setAttribute('data-label', labelText);
       el.setAttribute('data-rotation', '0');
@@ -702,7 +710,6 @@
       selectElement(el, { stopPropagation: () => {} });
     }
 
-    /* BEREINIGTE RECOVERY-FUNKTION (REPARIERT ALTEN SPEICHERSTAND) */
     function restoreStageElement(data, isAdminLocked) {
       const stage = document.getElementById('stageCanvas');
       const el = document.createElement('div');
@@ -723,20 +730,14 @@
 
       const displayLabel = isAdminLocked ? `[ADMIN] ${data.label || ''}` : (data.label || '');
 
-      // 1. Prüfen, ob valider SVG-String vorliegt
       let finalSvg = data.svgHtml;
-
-      // 2. Fallback auf Altdaten (data.html)
       if (!finalSvg && data.html) {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = data.html;
         const foundSvg = tempDiv.querySelector('svg');
-        if (foundSvg) {
-          finalSvg = foundSvg.outerHTML;
-        }
+        if (foundSvg) finalSvg = foundSvg.outerHTML;
       }
 
-      // 3. Wenn immer noch leer, erzeuge Platzhalter-Box statt 'undefined'
       if (!finalSvg) {
         finalSvg = `<svg class="element-svg" width="35" height="35"><rect x="2" y="2" width="31" height="31" fill="#ffffff" stroke="#000" stroke-width="2"/></svg>`;
       }
@@ -844,9 +845,9 @@
       let active = false;
       let currentX, currentY, initialX, initialY;
 
-      element.addEventListener("touchstart", dragStart, false);
-      element.addEventListener("touchend", dragEnd, false);
-      element.addEventListener("touchmove", drag, false);
+      element.addEventListener("touchstart", dragStart, {passive: false});
+      element.addEventListener("touchend", dragEnd, {passive: false});
+      element.addEventListener("touchmove", drag, {passive: false});
 
       element.addEventListener("mousedown", dragStart, false);
       document.addEventListener("mouseup", dragEnd, false);
